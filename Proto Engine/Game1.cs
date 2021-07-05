@@ -11,7 +11,14 @@ namespace Proto_Engine
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        LevelTilesRenderer levelTilesRenderer; 
+        private int ScreenWidth = 1920 / 2;
+        private int ScreenHeight = 1080 / 2;
+
+        RenderTarget2D renderTarget;
+
+        LevelTilesRenderer levelTilesRenderer;
+        Camera mainCamera;
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -22,6 +29,18 @@ namespace Proto_Engine
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            _graphics.PreferredBackBufferWidth = ScreenWidth;
+            _graphics.PreferredBackBufferHeight = ScreenHeight;
+            _graphics.IsFullScreen = false;
+            _graphics.ApplyChanges();
+
+            renderTarget = new RenderTarget2D(
+                            GraphicsDevice,
+                            320,
+                            180,
+                            false,
+                            GraphicsDevice.PresentationParameters.BackBufferFormat,
+                            DepthFormat.Depth24);
 
             base.Initialize();
         }
@@ -32,6 +51,7 @@ namespace Proto_Engine
             DataManager.LoadProjects();
             DataManager.LoadTilesets(GraphicsDevice);
             levelTilesRenderer = new LevelTilesRenderer(DataManager.projects["Typical_TopDown_example"].Levels[0]);
+            mainCamera = new Camera();
             // TODO: use this.Content to load your game content here
         }
 
@@ -47,12 +67,21 @@ namespace Proto_Engine
 
         protected override void Draw(GameTime gameTime)
         {
+            GraphicsDevice.SetRenderTarget(renderTarget);
             GraphicsDevice.Clear(Color.CornflowerBlue);
-
-            // TODO: Add your drawing code here
             _spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
 
             levelTilesRenderer.Render(_spriteBatch);
+
+            _spriteBatch.End();
+
+            GraphicsDevice.SetRenderTarget(null);
+            GraphicsDevice.Clear(Color.CornflowerBlue);
+
+            // TODO: Add your drawing code here
+            _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null);
+
+            _spriteBatch.Draw(renderTarget, new Vector2(0, 0), new Rectangle(0, 0, renderTarget.Width, renderTarget.Height), Color.White, 0, new Vector2(0, 0), ScreenWidth / 320, SpriteEffects.None, 1);
 
             _spriteBatch.End();
 

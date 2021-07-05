@@ -12,6 +12,7 @@
   <ItemGroup>
     <None Remove="Icon.ico" />
     <None Remove="Icon.bmp" />
+    <None Remove="ECS\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
@@ -27,5 +28,8 @@
     <Reference Include="MonoGame LDtk Importer">
       <HintPath>..\..\..\..\Documents\GitHub\MonoGame-LDtk-Importer\MonoGame LDtk Importer\bin\Release\netcoreapp3.1\MonoGame LDtk Importer.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ECS\" />
   </ItemGroup>
 </Project>

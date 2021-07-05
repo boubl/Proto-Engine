@@ -14,7 +14,7 @@ namespace Proto_Engine
         public static void LoadProjects()
         {
             projects = new Dictionary<string, LDtkProject>();
-            projects.Add("Typical_TopDown_example", new LDtkProject(@"C:\Users\Boubli\source\repos\Proto Engine\Proto Engine\Content\Typical_TopDown_example.ldtk"));
+            projects.Add("Typical_TopDown_example", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/Proto-Engine/Proto Engine/Content/Typical_TopDown_example.ldtk"));
         }
 
         public static void LoadTilesets(GraphicsDevice graphicsDevice)

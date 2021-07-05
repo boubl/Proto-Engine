@@ -33,9 +33,11 @@ namespace Proto_Engine.Scene
                         Rectangle destinationRectangle = new Rectangle(tile.Coordinates.X, tile.Coordinates.Y, auto.GridSize, auto.GridSize);
                         SpriteEffects spriteEffects = SpriteEffects.None;
                         float rotation = 0;
+                        Vector2 origin = new Vector2(0, 0);
                         if (tile.IsFlippedOnX && tile.IsFlippedOnY)
                         {
                             rotation = (float)Math.PI;
+                            origin = new Vector2(auto.GridSize, auto.GridSize);
                         }
                         else if (tile.IsFlippedOnY)
                         {
@@ -45,7 +47,7 @@ namespace Proto_Engine.Scene
                         {
                             spriteEffects = SpriteEffects.FlipHorizontally;
                         }
-                        spriteBatch.Draw(DataManager.tilesets[auto.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, new Vector2(0, 0), spriteEffects, 1);
+                        spriteBatch.Draw(DataManager.tilesets[auto.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, origin, spriteEffects, 1);
                     }
                 }
                 if (layer.Type == LayerType.IntGrid)
@@ -57,9 +59,11 @@ namespace Proto_Engine.Scene
                         Rectangle destinationRectangle = new Rectangle(tile.Coordinates.X, tile.Coordinates.Y, intGridLayer.GridSize, intGridLayer.GridSize);
                         SpriteEffects spriteEffects = SpriteEffects.None;
                         float rotation = 0;
+                        Vector2 origin = new Vector2(0, 0);
                         if (tile.IsFlippedOnX && tile.IsFlippedOnY)
                         {
                             rotation = (float)Math.PI;
+                            origin = new Vector2(intGridLayer.GridSize, intGridLayer.GridSize);
                         }
                         else if (tile.IsFlippedOnY)
                         {
@@ -69,7 +73,7 @@ namespace Proto_Engine.Scene
                         {
                             spriteEffects = SpriteEffects.FlipHorizontally;
                         }
-                        spriteBatch.Draw(DataManager.tilesets[intGridLayer.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, new Vector2(0, 0), spriteEffects, 1);
+                        spriteBatch.Draw(DataManager.tilesets[intGridLayer.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, origin, spriteEffects, 1);
                     }
                 }
                 if (layer.Type == LayerType.Tiles)
@@ -81,9 +85,11 @@ namespace Proto_Engine.Scene
                         Rectangle destinationRectangle = new Rectangle(tile.Coordinates.X, tile.Coordinates.Y, tileLayer.GridSize, tileLayer.GridSize);
                         SpriteEffects spriteEffects = SpriteEffects.None;
                         float rotation = 0;
+                        Vector2 origin = new Vector2(0, 0);
                         if (tile.IsFlippedOnX && tile.IsFlippedOnY)
                         {
                             rotation = (float)Math.PI;
+                            origin = new Vector2(tileLayer.GridSize, tileLayer.GridSize);
                         }
                         else if (tile.IsFlippedOnY)
                         {
@@ -93,7 +99,7 @@ namespace Proto_Engine.Scene
                         {
                             spriteEffects = SpriteEffects.FlipHorizontally;
                         }
-                        spriteBatch.Draw(DataManager.tilesets[tileLayer.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, new Vector2(0, 0), spriteEffects, 1);
+                        spriteBatch.Draw(DataManager.tilesets[tileLayer.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, origin, spriteEffects, 1);
                     }
                 }
             }
