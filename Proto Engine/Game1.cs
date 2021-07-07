@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame_LDtk_Importer;
+using Proto_Engine.ECS;
 using Proto_Engine.Scene;
 
 namespace Proto_Engine
@@ -11,13 +12,14 @@ namespace Proto_Engine
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private int ScreenWidth = 1920 / 2;
-        private int ScreenHeight = 1080 / 2;
+        public static int ScreenWidth = 1920 / 2;
+        public static int ScreenHeight = 1080 / 2;
 
         RenderTarget2D renderTarget;
 
         LevelTilesRenderer levelTilesRenderer;
         Camera mainCamera;
+        Player player;
 
         public Game1()
         {
@@ -50,8 +52,9 @@ namespace Proto_Engine
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             DataManager.LoadProjects();
             DataManager.LoadTilesets(GraphicsDevice);
+            player = new Player(new Rectangle(0, 0, 1, 1));
             levelTilesRenderer = new LevelTilesRenderer(DataManager.projects["Typical_TopDown_example"].Levels[0]);
-            mainCamera = new Camera();
+            mainCamera = new Camera(player);
             // TODO: use this.Content to load your game content here
         }
 
@@ -59,7 +62,8 @@ namespace Proto_Engine
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
+            player.Update();
+            mainCamera.Update();
             // TODO: Add your update logic here
 
             base.Update(gameTime);

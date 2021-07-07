@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
-using MonoGame_LDtk_Importer;
+using Proto_Engine.ECS;
 
 namespace Proto_Engine.Scene
 {
@@ -16,7 +16,7 @@ namespace Proto_Engine.Scene
 
         public void Update()
         {
-            offset = focusedEntity.Coordinates;
+            offset = focusedEntity.Position;
         }
     }
 }
