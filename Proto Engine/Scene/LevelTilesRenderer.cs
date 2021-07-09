@@ -10,7 +10,11 @@ namespace Proto_Engine.Scene
     public class LevelTilesRenderer
     {
         List<Layer> layers;
-        public LevelTilesRenderer(Level level)
+        Vector2 coordinates;
+        Texture2D bg;
+        Vector2 bgScale;
+
+        public LevelTilesRenderer(Level level, GraphicsDevice graphicsDevice)
         {
             List<LayerType> types = new List<LayerType>();
             types.Add(LayerType.AutoLayer);
@@ -18,10 +22,25 @@ namespace Proto_Engine.Scene
             types.Add(LayerType.IntGrid);
             layers = level.GetLayersByType(types);
             layers.Reverse();
+
+            coordinates = level.WorldCoordinates;
+
+            bg = new Texture2D(graphicsDevice, level.Width, level.Height);
+            Color[] data = new Color[level.Width * level.Height];
+            for (int i = 0; i < data.Length; ++i) data[i] = level.BackgroundColor;
+            bg.SetData(data);
+            bgScale = new Vector2(1, 1);
+
+            if (level.BackgroundPosition != null)
+            {
+                bg = level.GetCroppedBackground(graphicsDevice);
+                bgScale = level.BackgroundPosition.Scale;
+            }
         }
 
         public void Render(SpriteBatch spriteBatch)
         {
+            spriteBatch.Draw(bg, new Rectangle((int)(coordinates.X - Camera.offset.X), (int)(coordinates.Y - Camera.offset.X), (int)(bg.Width * bgScale.X), (int)(bg.Height * bgScale.Y)), Color.White);
             foreach (Layer layer in layers)
             {
                 if (layer.Type == LayerType.AutoLayer)
@@ -30,7 +49,7 @@ namespace Proto_Engine.Scene
                     foreach (Tile tile in auto.AutoLayerTiles)
                     {
                         Rectangle sourceRectangle = new Rectangle((int)tile.Source.X, (int)tile.Source.Y, auto.GridSize, auto.GridSize);
-                        Rectangle destinationRectangle = new Rectangle((int)(tile.Coordinates.X - Camera.offset.X), (int)(tile.Coordinates.Y - Camera.offset.Y), auto.GridSize, auto.GridSize);
+                        Rectangle destinationRectangle = new Rectangle((int)(tile.Coordinates.X - Camera.offset.X + coordinates.X), (int)(tile.Coordinates.Y - Camera.offset.Y + coordinates.Y), auto.GridSize, auto.GridSize);
                         SpriteEffects spriteEffects = SpriteEffects.None;
                         float rotation = 0;
                         Vector2 origin = new Vector2(0, 0);
@@ -56,7 +75,7 @@ namespace Proto_Engine.Scene
                     foreach (Tile tile in intGridLayer.AutoLayerTiles)
                     {
                         Rectangle sourceRectangle = new Rectangle((int)tile.Source.X, (int)tile.Source.Y, intGridLayer.GridSize, intGridLayer.GridSize);
-                        Rectangle destinationRectangle = new Rectangle((int)(tile.Coordinates.X - Camera.offset.X), (int)(tile.Coordinates.Y - Camera.offset.Y), intGridLayer.GridSize, intGridLayer.GridSize);
+                        Rectangle destinationRectangle = new Rectangle((int)(tile.Coordinates.X - Camera.offset.X + coordinates.X), (int)(tile.Coordinates.Y - Camera.offset.Y + coordinates.Y), intGridLayer.GridSize, intGridLayer.GridSize);
                         SpriteEffects spriteEffects = SpriteEffects.None;
                         float rotation = 0;
                         Vector2 origin = new Vector2(0, 0);
@@ -82,7 +101,7 @@ namespace Proto_Engine.Scene
                     foreach (Tile tile in tileLayer.GridTilesInstances)
                     {
                         Rectangle sourceRectangle = new Rectangle((int)tile.Source.X, (int)tile.Source.Y, tileLayer.GridSize, tileLayer.GridSize);
-                        Rectangle destinationRectangle = new Rectangle((int)(tile.Coordinates.X - Camera.offset.X), (int)(tile.Coordinates.Y - Camera.offset.Y), tileLayer.GridSize, tileLayer.GridSize);
+                        Rectangle destinationRectangle = new Rectangle((int)(tile.Coordinates.X - Camera.offset.X + coordinates.X), (int)(tile.Coordinates.Y - Camera.offset.Y + coordinates.Y), tileLayer.GridSize, tileLayer.GridSize);
                         SpriteEffects spriteEffects = SpriteEffects.None;
                         float rotation = 0;
                         Vector2 origin = new Vector2(0, 0);

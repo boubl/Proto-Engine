@@ -17,7 +17,7 @@ namespace Proto_Engine
 
         RenderTarget2D renderTarget;
 
-        LevelTilesRenderer levelTilesRenderer;
+        ProjectTilesRenderer projectTilesRenderer;
         Camera mainCamera;
         Player player;
 
@@ -38,8 +38,8 @@ namespace Proto_Engine
 
             renderTarget = new RenderTarget2D(
                             GraphicsDevice,
-                            320,
-                            180,
+                            1920,//320,
+                            1080,//180,
                             false,
                             GraphicsDevice.PresentationParameters.BackBufferFormat,
                             DepthFormat.Depth24);
@@ -53,7 +53,7 @@ namespace Proto_Engine
             DataManager.LoadProjects();
             DataManager.LoadTilesets(GraphicsDevice);
             player = new Player(new Rectangle(0, 0, 1, 1));
-            levelTilesRenderer = new LevelTilesRenderer(DataManager.projects["Typical_TopDown_example"].Levels[0]);
+            projectTilesRenderer = new ProjectTilesRenderer(DataManager.projects["WorldMap_GridVania_layout"], GraphicsDevice);
             mainCamera = new Camera(player);
             // TODO: use this.Content to load your game content here
         }
@@ -75,7 +75,7 @@ namespace Proto_Engine
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
 
-            levelTilesRenderer.Render(_spriteBatch);
+            projectTilesRenderer.Render(_spriteBatch);
 
             _spriteBatch.End();
 
@@ -85,7 +85,8 @@ namespace Proto_Engine
             // TODO: Add your drawing code here
             _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null);
 
-            _spriteBatch.Draw(renderTarget, new Vector2(0, 0), new Rectangle(0, 0, renderTarget.Width, renderTarget.Height), Color.White, 0, new Vector2(0, 0), ScreenWidth / 320, SpriteEffects.None, 1);
+            //ScreenWidth / 320
+            _spriteBatch.Draw(renderTarget, new Vector2(0, 0), new Rectangle(0, 0, renderTarget.Width, renderTarget.Height), Color.White, 0, new Vector2(0, 0), 1, SpriteEffects.None, 1);
 
             _spriteBatch.End();
 
