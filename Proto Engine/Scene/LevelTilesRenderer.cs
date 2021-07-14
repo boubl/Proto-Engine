@@ -38,7 +38,7 @@ namespace Proto_Engine.Scene
             }
         }
 
-        public void Render(SpriteBatch spriteBatch)
+        public void Render(SpriteBatch spriteBatch, Dictionary<int, Texture2D> tilesets)
         {
             spriteBatch.Draw(bg, new Rectangle((int)(coordinates.X - Camera.offset.X), (int)(coordinates.Y - Camera.offset.X), (int)(bg.Width * bgScale.X), (int)(bg.Height * bgScale.Y)), Color.White);
             foreach (Layer layer in layers)
@@ -66,7 +66,7 @@ namespace Proto_Engine.Scene
                         {
                             spriteEffects = SpriteEffects.FlipHorizontally;
                         }
-                        spriteBatch.Draw(DataManager.tilesets[auto.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, origin, spriteEffects, 1);
+                        spriteBatch.Draw(tilesets[auto.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, origin, spriteEffects, 1);
                     }
                 }
                 if (layer.Type == LayerType.IntGrid)
@@ -92,7 +92,7 @@ namespace Proto_Engine.Scene
                         {
                             spriteEffects = SpriteEffects.FlipHorizontally;
                         }
-                        spriteBatch.Draw(DataManager.tilesets[intGridLayer.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, origin, spriteEffects, 1);
+                        spriteBatch.Draw(tilesets[intGridLayer.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, origin, spriteEffects, 1);
                     }
                 }
                 if (layer.Type == LayerType.Tiles)
@@ -118,7 +118,7 @@ namespace Proto_Engine.Scene
                         {
                             spriteEffects = SpriteEffects.FlipHorizontally;
                         }
-                        spriteBatch.Draw(DataManager.tilesets[tileLayer.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, origin, spriteEffects, 1);
+                        spriteBatch.Draw(tilesets[tileLayer.TilesetDefUid.Value], destinationRectangle, sourceRectangle, Color.White, rotation, origin, spriteEffects, 1);
                     }
                 }
             }

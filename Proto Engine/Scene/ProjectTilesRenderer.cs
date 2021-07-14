@@ -29,7 +29,7 @@ namespace Proto_Engine.Scene
         {
             foreach (LevelTilesRenderer level in levels)
             {
-                level.Render(spriteBatch);
+                level.Render(spriteBatch, tilesets);
             }
         }
     }

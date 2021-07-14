@@ -51,7 +51,7 @@ namespace Proto_Engine
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             DataManager.LoadProjects();
-            DataManager.LoadTilesets(GraphicsDevice);
+            //DataManager.LoadTilesets(GraphicsDevice);
             player = new Player(new Rectangle(0, 0, 1, 1));
             projectTilesRenderer = new ProjectTilesRenderer(DataManager.projects["WorldMap_GridVania_layout"], GraphicsDevice);
             mainCamera = new Camera(player);

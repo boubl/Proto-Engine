@@ -49,7 +49,7 @@ namespace Proto_Engine.ECS
         {
             if (drawTile)
             {
-                spriteBatch.Draw(DataManager.tilesets[TileTsUid.Value], Position, TileSourceRect, Color.White);
+                //spriteBatch.Draw(DataManager.tilesets[TileTsUid.Value], Position, TileSourceRect, Color.White);
             }
         }
     }
