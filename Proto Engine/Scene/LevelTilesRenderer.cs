@@ -13,6 +13,7 @@ namespace Proto_Engine.Scene
         Vector2 coordinates;
         Texture2D bg;
         Vector2 bgScale;
+        Vector2 bgCoordinates;
 
         public LevelTilesRenderer(Level level, GraphicsDevice graphicsDevice)
         {
@@ -35,12 +36,14 @@ namespace Proto_Engine.Scene
             {
                 bg = level.GetCroppedBackground(graphicsDevice);
                 bgScale = level.BackgroundPosition.Scale;
+                bgCoordinates = level.BackgroundPosition.Coordinates;
             }
         }
 
         public void Render(SpriteBatch spriteBatch, Dictionary<int, Texture2D> tilesets)
         {
-            spriteBatch.Draw(bg, new Rectangle((int)(coordinates.X - Camera.offset.X), (int)(coordinates.Y - Camera.offset.X), (int)(bg.Width * bgScale.X), (int)(bg.Height * bgScale.Y)), Color.White);
+            spriteBatch.Draw(bg, new Rectangle((int)(coordinates.X - Camera.offset.X + bgCoordinates.X), (int)(coordinates.Y - Camera.offset.Y + bgCoordinates.Y), (int)(bg.Width * bgScale.X), (int)(bg.Height * bgScale.Y)), Color.White);
+            
             foreach (Layer layer in layers)
             {
                 if (layer.Type == LayerType.AutoLayer)

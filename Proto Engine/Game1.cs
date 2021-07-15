@@ -38,8 +38,8 @@ namespace Proto_Engine
 
             renderTarget = new RenderTarget2D(
                             GraphicsDevice,
-                            1920,//320,
-                            1080,//180,
+                            1920 / 6,
+                            1080 / 6,
                             false,
                             GraphicsDevice.PresentationParameters.BackBufferFormat,
                             DepthFormat.Depth24);
@@ -52,27 +52,27 @@ namespace Proto_Engine
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             DataManager.LoadProjects();
             //DataManager.LoadTilesets(GraphicsDevice);
-            player = new Player(new Rectangle(0, 0, 1, 1));
-            projectTilesRenderer = new ProjectTilesRenderer(DataManager.projects["WorldMap_GridVania_layout"], GraphicsDevice);
+            player = new Player(new Rectangle(0, 1080, 1, 1));
+            projectTilesRenderer = new ProjectTilesRenderer("Test_file_for_API_showing_all_features", GraphicsDevice);
             mainCamera = new Camera(player);
             // TODO: use this.Content to load your game content here
         }
-
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             player.Update();
             mainCamera.Update();
+            projectTilesRenderer.Update(GraphicsDevice);
             // TODO: Add your update logic here
-
+            
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.SetRenderTarget(renderTarget);
-            GraphicsDevice.Clear(Color.CornflowerBlue);
+            GraphicsDevice.Clear(Color.Transparent);
             _spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
 
             projectTilesRenderer.Render(_spriteBatch);
@@ -86,7 +86,7 @@ namespace Proto_Engine
             _spriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointClamp, null, null);
 
             //ScreenWidth / 320
-            _spriteBatch.Draw(renderTarget, new Vector2(0, 0), new Rectangle(0, 0, renderTarget.Width, renderTarget.Height), Color.White, 0, new Vector2(0, 0), 1, SpriteEffects.None, 1);
+            _spriteBatch.Draw(renderTarget, new Vector2(0, 0), new Rectangle(0, 0, renderTarget.Width, renderTarget.Height), Color.White, 0, new Vector2(0, 0), 3, SpriteEffects.None, 1);
 
             _spriteBatch.End();
 

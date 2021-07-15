@@ -9,19 +9,43 @@ namespace Proto_Engine.Scene
     {
         List<LevelTilesRenderer> levels;
         public Dictionary<int, Texture2D> tilesets;
+        private string projectName;
+        LDtkProject currentProject;
 
-        public ProjectTilesRenderer(LDtkProject project, GraphicsDevice graphicsDevice)
+        public ProjectTilesRenderer(string projectName, GraphicsDevice graphicsDevice)
         {
             levels = new List<LevelTilesRenderer>();
-            foreach (Level level in project.Levels)
+            currentProject = DataManager.projects[projectName];
+            foreach (Level level in currentProject.Levels)
             {
                 levels.Add(new LevelTilesRenderer(level, graphicsDevice));
             }
 
             tilesets = new Dictionary<int, Texture2D>();
-            foreach (TilesetDef tileset in project.Definitions.Tilesets)
+            foreach (TilesetDef tileset in currentProject.Definitions.Tilesets)
             {
                 tilesets.Add(tileset.Uid, tileset.GetTilesetTexture(graphicsDevice));
+            }
+
+            this.projectName = projectName;
+        }
+
+        public void Update(GraphicsDevice graphicsDevice)
+        {
+            if (currentProject != DataManager.projects[projectName])
+            {
+                currentProject = DataManager.projects[projectName];
+                levels = new List<LevelTilesRenderer>();
+                foreach (Level level in currentProject.Levels)
+                {
+                    levels.Add(new LevelTilesRenderer(level, graphicsDevice));
+                }
+
+                tilesets = new Dictionary<int, Texture2D>();
+                foreach (TilesetDef tileset in currentProject.Definitions.Tilesets)
+                {
+                    tilesets.Add(tileset.Uid, tileset.GetTilesetTexture(graphicsDevice));
+                }
             }
         }
 

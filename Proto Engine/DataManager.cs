@@ -2,42 +2,67 @@
 using MonoGame_LDtk_Importer;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Proto_Engine
 {
-    public class DataManager
+    public static class DataManager
     {
         //public static Dictionary<int, Texture2D> tilesets;
         public static Dictionary<string, LDtkProject> projects;
 
+        private static List<string> projectList;
+        private static Dictionary<string, DateTime> lastWrite;
+        private static FileSystemWatcher watcher;
+
         public static void LoadProjects()
         {
             projects = new Dictionary<string, LDtkProject>();
-            projects.Add("AutoLayers_1_basic", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_1_basic.ldtk"));
-            projects.Add("AutoLayers_2_stamps", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_2_stamps.ldtk"));
-            projects.Add("AutoLayers_3_Mosaic", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_3_Mosaic.ldtk"));
-            projects.Add("AutoLayers_4_Advanced", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_4_Advanced.ldtk"));
-            projects.Add("AutoLayers_5_OptionalRules", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_5_OptionalRules.ldtk"));
-            projects.Add("Entities", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/Entities.ldtk"));
-            projects.Add("SeparateLevelFiles", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/SeparateLevelFiles.ldtk"));
-            projects.Add("Test_file_for_API_showing_all_features", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/Test_file_for_API_showing_all_features.ldtk"));
-            projects.Add("Typical_2D_platformer_example", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/Typical_2D_platformer_example.ldtk"));
-            projects.Add("Typical_TopDown_example", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/Typical_TopDown_example.ldtk"));
-            projects.Add("WorldMap_Free_layout", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/WorldMap_Free_layout.ldtk"));
-            projects.Add("WorldMap_GridVania_layout", new LDtkProject("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/WorldMap_GridVania_layout.ldtk"));
+            projectList = new List<string>();
+
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_1_basic.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_2_stamps.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_3_Mosaic.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_4_Advanced.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/AutoLayers_5_OptionalRules.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/Entities.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/SeparateLevelFiles.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/Test_file_for_API_showing_all_features.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/Typical_2D_platformer_example.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/Typical_TopDown_example.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/WorldMap_Free_layout.ldtk");
+            projectList.Add("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/WorldMap_GridVania_layout.ldtk");
+
+            foreach(string path in projectList)
+            {
+                projects.Add(Path.GetFileNameWithoutExtension(path), new LDtkProject(path));
+            }
+
+            watcher = new FileSystemWatcher("/Users/AlexisNicolas/Documents/GitHub/LDtk/LDtk.app/Contents/samples/");
+
+            watcher.NotifyFilter = NotifyFilters.LastWrite;
+
+            watcher.Changed += OnChanged;
+
+            watcher.Filter = "*.ldtk";
+            watcher.IncludeSubdirectories = true;
+            watcher.EnableRaisingEvents = true;
         }
 
-        //public static void LoadTilesets(GraphicsDevice graphicsDevice)
-        //{
-        //    tilesets = new Dictionary<int, Texture2D>();
-        //    foreach (LDtkProject project in projects.Values)
-        //    {
-        //        foreach (TilesetDef tileset in project.Definitions.Tilesets)
-        //        {
-        //            tilesets.Add(tileset.Uid, tileset.GetTilesetTexture(graphicsDevice));
-        //        }
-        //    }
-        //}
+        private static void OnChanged(object sender, FileSystemEventArgs e)
+        {
+            if (e.ChangeType != WatcherChangeTypes.Changed)
+            {
+                return;
+            }
+
+            if (projects.ContainsKey(Path.GetFileNameWithoutExtension(e.FullPath)))
+            {
+                projects[Path.GetFileNameWithoutExtension(e.FullPath)] = new LDtkProject(e.FullPath);
+            }
+
+        }
+
     }
 }
