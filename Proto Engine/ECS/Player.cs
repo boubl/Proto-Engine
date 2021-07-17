@@ -2,20 +2,21 @@
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Proto_Engine.Scene;
 
 namespace Proto_Engine.ECS
 {
     public class Player : Entity
     {
-        public Player(MonoGame_LDtk_Importer.Entity entity) : base(entity)
+        public Player(MonoGame_LDtk_Importer.Entity entity, GraphicsDevice graphicsDevice) : base(entity, graphicsDevice)
         {
         }
 
-        public Player(Rectangle rectangle) : base(rectangle)
+        public Player(Rectangle rectangle, GraphicsDevice graphicsDevice) : base(rectangle, graphicsDevice)
         {
         }
 
-        public Player(Vector2 position, Rectangle rectangle) : base(position, rectangle)
+        public Player(Vector2 position, Rectangle rectangle, GraphicsDevice graphicsDevice) : base(position, rectangle, graphicsDevice)
         {
         }
 
@@ -42,7 +43,7 @@ namespace Proto_Engine.ECS
 
         public override void Draw(SpriteBatch spriteBatch)
         {
-            
+            spriteBatch.Draw(Texture, Position - Camera.offset, Color.White);
         }
 
         public void Draw(SpriteBatch spriteBatch, bool drawTile)

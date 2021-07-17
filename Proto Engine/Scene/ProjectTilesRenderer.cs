@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using MonoGame_LDtk_Importer;
 
@@ -8,6 +9,7 @@ namespace Proto_Engine.Scene
     public class ProjectTilesRenderer
     {
         List<LevelTilesRenderer> levels;
+        public Rectangle currentLevelRectangle { get; private set; }
         public Dictionary<int, Texture2D> tilesets;
         private string projectName;
         LDtkProject currentProject;
@@ -47,6 +49,7 @@ namespace Proto_Engine.Scene
                     tilesets.Add(tileset.Uid, tileset.GetTilesetTexture(graphicsDevice));
                 }
             }
+            currentLevelRectangle = SetCurrentLevelRectangle();
         }
 
         public void Render(SpriteBatch spriteBatch)
@@ -55,6 +58,26 @@ namespace Proto_Engine.Scene
             {
                 level.Render(spriteBatch, tilesets);
             }
+        }
+
+        public Rectangle SetCurrentLevelRectangle()
+        {
+            int i = 0;
+            Rectangle newRectangle = new Rectangle();
+            foreach (LevelTilesRenderer level in levels)
+            {
+                if (Game1.player.BaseRectangle.Intersects(level.Rectangle))
+                {
+                    i++;
+                    newRectangle = level.Rectangle;
+                }
+            }
+
+            if (i > 1)
+            {
+                return currentLevelRectangle;
+            }
+            else return newRectangle;
         }
     }
 }

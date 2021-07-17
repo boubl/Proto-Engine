@@ -9,6 +9,8 @@ namespace Proto_Engine.Scene
 {
     public class LevelTilesRenderer
     {
+        public Rectangle Rectangle;
+
         List<Layer> layers;
         Vector2 coordinates;
         Texture2D bg;
@@ -38,6 +40,8 @@ namespace Proto_Engine.Scene
                 bgScale = level.BackgroundPosition.Scale;
                 bgCoordinates = level.BackgroundPosition.Coordinates;
             }
+
+            Rectangle = new Rectangle((int)coordinates.X, (int)coordinates.Y, level.Width, level.Height);
         }
 
         public void Render(SpriteBatch spriteBatch, Dictionary<int, Texture2D> tilesets)

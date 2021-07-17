@@ -1,9 +1,12 @@
-﻿using Microsoft.Xna.Framework;
+﻿using BmFont;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame_LDtk_Importer;
 using Proto_Engine.ECS;
 using Proto_Engine.Scene;
+using ImGuiNET;
+using System;
 
 namespace Proto_Engine
 {
@@ -14,12 +17,17 @@ namespace Proto_Engine
 
         public static int ScreenWidth = 1920 / 2;
         public static int ScreenHeight = 1080 / 2;
+        public static int PixelWidth = ScreenWidth / 3;
+        public static int PixelHeight = ScreenHeight / 3;
 
         RenderTarget2D renderTarget;
+        FontFile font;
+        
+        private ImGuiRenderer _imGuiRenderer;
+        IntPtr imGuiTx;
 
-        ProjectTilesRenderer projectTilesRenderer;
-        Camera mainCamera;
-        Player player;
+        public static ProjectTilesRenderer currentProject;
+        public static Player player;
 
         public Game1()
         {
@@ -38,11 +46,14 @@ namespace Proto_Engine
 
             renderTarget = new RenderTarget2D(
                             GraphicsDevice,
-                            1920 / 6,
-                            1080 / 6,
+                            ScreenWidth / 3,
+                            ScreenHeight / 3,
                             false,
                             GraphicsDevice.PresentationParameters.BackBufferFormat,
                             DepthFormat.Depth24);
+
+            _imGuiRenderer = new ImGuiRenderer(this);
+            _imGuiRenderer.RebuildFontAtlas();
 
             base.Initialize();
         }
@@ -52,9 +63,11 @@ namespace Proto_Engine
             _spriteBatch = new SpriteBatch(GraphicsDevice);
             DataManager.LoadProjects();
             //DataManager.LoadTilesets(GraphicsDevice);
-            player = new Player(new Rectangle(0, 1080, 1, 1));
-            projectTilesRenderer = new ProjectTilesRenderer("Test_file_for_API_showing_all_features", GraphicsDevice);
-            mainCamera = new Camera(player);
+            player = new Player(new Rectangle(0, 1080, 16, 16), GraphicsDevice);
+            currentProject = new ProjectTilesRenderer("Test_file_for_API_showing_all_features", GraphicsDevice);
+            Camera.SetCamera(player);
+            font = FontLoader.Load("/Users/AlexisNicolas/Documents/GitHub/Proto-Engine/Proto Engine/Content/textures/SF Mono/SF mono.fnt");
+            imGuiTx = _imGuiRenderer.BindTexture(player.Texture);
             // TODO: use this.Content to load your game content here
         }
         protected override void Update(GameTime gameTime)
@@ -62,8 +75,8 @@ namespace Proto_Engine
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
             player.Update();
-            mainCamera.Update();
-            projectTilesRenderer.Update(GraphicsDevice);
+            Camera.Update();
+            currentProject.Update(GraphicsDevice);
             // TODO: Add your update logic here
             
             base.Update(gameTime);
@@ -75,7 +88,8 @@ namespace Proto_Engine
             GraphicsDevice.Clear(Color.Transparent);
             _spriteBatch.Begin(blendState: BlendState.NonPremultiplied);
 
-            projectTilesRenderer.Render(_spriteBatch);
+            currentProject.Render(_spriteBatch);
+            player.Draw(_spriteBatch);
 
             _spriteBatch.End();
 
@@ -89,6 +103,19 @@ namespace Proto_Engine
             _spriteBatch.Draw(renderTarget, new Vector2(0, 0), new Rectangle(0, 0, renderTarget.Width, renderTarget.Height), Color.White, 0, new Vector2(0, 0), 3, SpriteEffects.None, 1);
 
             _spriteBatch.End();
+
+            // Call BeforeLayout first to set things up
+            _imGuiRenderer.BeforeLayout(gameTime);
+
+            // Draw our UI
+            ImGui.Begin("Debug");
+            ImGui.Text("Player position:" + player.Position.ToString());
+            ImGui.Text("Camera offset:" + Camera.offset.ToString());
+            ImGui.Text("Current level rectangle: " + currentProject.currentLevelRectangle);
+            ImGui.End();
+
+            // Call AfterLayout now to finish up and draw all the things
+            _imGuiRenderer.AfterLayout();
 
             base.Draw(gameTime);
         }
