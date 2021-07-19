@@ -21,13 +21,15 @@ namespace Proto_Engine
         public static int PixelHeight = ScreenHeight / 3;
 
         RenderTarget2D renderTarget;
-        FontFile font;
+        BitmapFont font;
         
         private ImGuiRenderer _imGuiRenderer;
         IntPtr imGuiTx;
 
         public static ProjectTilesRenderer currentProject;
         public static Player player;
+
+        public string text = "Test";
 
         public Game1()
         {
@@ -66,7 +68,7 @@ namespace Proto_Engine
             player = new Player(new Rectangle(0, 1080, 16, 16), GraphicsDevice);
             currentProject = new ProjectTilesRenderer("Test_file_for_API_showing_all_features", GraphicsDevice);
             Camera.SetCamera(player);
-            font = FontLoader.Load("/Users/AlexisNicolas/Documents/GitHub/Proto-Engine/Proto Engine/Content/textures/SF Mono/SF mono.fnt");
+            font = FontLoader.Load("/Users/AlexisNicolas/Documents/GitHub/Proto-Engine/Proto Engine/Content/textures/SF Mono/SF mono.fnt", GraphicsDevice);
             imGuiTx = _imGuiRenderer.BindTexture(player.Texture);
             // TODO: use this.Content to load your game content here
         }
@@ -90,6 +92,7 @@ namespace Proto_Engine
 
             currentProject.Render(_spriteBatch);
             player.Draw(_spriteBatch);
+            _spriteBatch.DrawString(font, text, new Vector2(0, 0), Color.White);
 
             _spriteBatch.End();
 
@@ -112,6 +115,7 @@ namespace Proto_Engine
             ImGui.Text("Player position:" + player.Position.ToString());
             ImGui.Text("Camera offset:" + Camera.offset.ToString());
             ImGui.Text("Current level rectangle: " + currentProject.currentLevelRectangle);
+            ImGui.InputText("Text", ref text, 50);
             ImGui.End();
 
             // Call AfterLayout now to finish up and draw all the things
