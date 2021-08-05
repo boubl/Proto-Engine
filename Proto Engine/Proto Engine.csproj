@@ -9,14 +9,9 @@
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <StartupObject />
   </PropertyGroup>
-  <ItemGroup>
-    <None Remove="Icon.ico" />
-    <None Remove="Icon.bmp" />
-    <None Remove="ECS\" />
-    <None Remove="MonoGame LDtk Importer" />
-    <None Remove="ImGui.NET" />
-  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Icon.ico" />
     <EmbeddedResource Include="Icon.bmp" />
@@ -27,20 +22,24 @@
     <Content Include="../deps/cimgui/linux-x64/cimgui.so" CopyToOutputDirectory="PreserveNewest" Link="lib%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
-    <TrimmerRootAssembly Include="Microsoft.Xna.Framework.Content.ContentTypeReader" Visible="false" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="MonoGame.Framework.DesktopGL" Version="3.8.0.1641" />
+    <PackageReference Include="MonoGame.Primitives2D" Version="1.1.1" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ECS\" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="MonoGame LDtk Importer">
-      <HintPath>..\..\MonoGame-LDtk-Importer\MonoGame LDtk Importer\bin\Release\netcoreapp3.1\MonoGame LDtk Importer.dll</HintPath>
-    </Reference>
     <Reference Include="ImGui.NET">
       <HintPath>..\..\ImGui.NET\bin\Debug\ImGui.NET\netcoreapp3.1\ImGui.NET.dll</HintPath>
     </Reference>
+    <Reference Include="MonoGame LDtk Importer">
+      <HintPath>..\..\..\..\source\repos\MonoGame LDtk Importer\MonoGame LDtk Importer\bin\Debug\netcoreapp3.1\MonoGame LDtk Importer.dll</HintPath>
+    </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="call &quot;C:\Users\Titou\Documents\GitHub\Proto-Engine\Proto Engine\Content\effects\Compile shaders.bat&quot;" />
+  </Target>
 </Project>

@@ -2,22 +2,31 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+#if DEBUG
+using MonoGame;
+#endif
 using MonoGame_LDtk_Importer;
+using Proto_Engine.Lights;
 
 namespace Proto_Engine.Scene
 {
     public class ProjectTilesRenderer
     {
-        List<LevelTilesRenderer> levels;
         public Rectangle currentLevelRectangle { get; private set; }
+        public List<int> intersectedLevels { get; private set; }
+        public List<Rectangle> currentCollisions { get; private set; }
         public Dictionary<int, Texture2D> tilesets;
+
+
+        private List<LevelTilesRenderer> levels;
+        private int currentLevelId = 0;
         private string projectName;
-        LDtkProject currentProject;
+        private LDtkProject currentProject;
 
         public ProjectTilesRenderer(string projectName, GraphicsDevice graphicsDevice)
         {
             levels = new List<LevelTilesRenderer>();
-            currentProject = DataManager.projects[projectName];
+            currentProject = DataManager.Projects[projectName];
             foreach (Level level in currentProject.Levels)
             {
                 levels.Add(new LevelTilesRenderer(level, graphicsDevice));
@@ -34,9 +43,9 @@ namespace Proto_Engine.Scene
 
         public void Update(GraphicsDevice graphicsDevice)
         {
-            if (currentProject != DataManager.projects[projectName])
+            if (currentProject != DataManager.Projects[projectName])
             {
-                currentProject = DataManager.projects[projectName];
+                currentProject = DataManager.Projects[projectName];
                 levels = new List<LevelTilesRenderer>();
                 foreach (Level level in currentProject.Levels)
                 {
@@ -49,35 +58,92 @@ namespace Proto_Engine.Scene
                     tilesets.Add(tileset.Uid, tileset.GetTilesetTexture(graphicsDevice));
                 }
             }
-            currentLevelRectangle = SetCurrentLevelRectangle();
+            currentLevelRectangle = GetCurrentLevelRectangle();
+            currentCollisions = GetCurrentLevelCollisions();
         }
 
         public void Render(SpriteBatch spriteBatch)
         {
-            foreach (LevelTilesRenderer level in levels)
+            levels[currentLevelId].Render(spriteBatch, tilesets);
+#if DEBUG
+            if (ProtoEngine.debug)
+            foreach (Rectangle rect in currentCollisions)
             {
-                level.Render(spriteBatch, tilesets);
+                spriteBatch.DrawRectangle(new Rectangle(rect.Location - Camera.offset.ToPoint(), rect.Size), Color.Red, 1);
+            }
+#endif
+        }
+
+        public void RenderLights(SpriteBatch spriteBatch)
+        {
+            foreach (Layer layer in currentProject.Levels[currentLevelId].LayerInstances)
+            {
+                if (layer.Identifier == "Lights")
+                {
+                    EntitieLayer entitieLayer = layer as EntitieLayer;
+                    foreach (Entity entity in entitieLayer.GetEntitiesByIdentifier("Light"))
+                    {
+                        Vector2 pos = entity.Coordinates - Camera.offset - (new Vector2(entity.Width / 2, entity.Height / 2));
+                        spriteBatch.Draw(LightCreator.Light, new Rectangle(pos.ToPoint(), new Point(entity.Width, entity.Height)), Color.White);
+                    }
+                }
             }
         }
 
-        public Rectangle SetCurrentLevelRectangle()
+        private Rectangle GetCurrentLevelRectangle()
         {
+            intersectedLevels = new List<int>();
             int i = 0;
+            int possibility = currentLevelId;
             Rectangle newRectangle = new Rectangle();
+            Rectangle playerRectangle = new Rectangle(ProtoEngine.player.Position.ToPoint(), ProtoEngine.player.BaseRectangle.Size);
+            int counter = 0;
             foreach (LevelTilesRenderer level in levels)
             {
-                if (Game1.player.BaseRectangle.Intersects(level.Rectangle))
+                if (playerRectangle.Intersects(level.Rectangle))
                 {
                     i++;
+                    intersectedLevels.Add(counter);
                     newRectangle = level.Rectangle;
+                    possibility = counter;
                 }
+                counter++;
             }
 
-            if (i > 1)
+            if (i != 1)
             {
+                intersectedLevels.Add(currentLevelId);
                 return currentLevelRectangle;
             }
-            else return newRectangle;
+            else
+            {
+                currentLevelId = possibility;
+                return newRectangle;
+            }
+        }
+
+        private List<Rectangle> GetCurrentLevelCollisions()
+        {
+            List<Rectangle> result = new List<Rectangle>();
+            foreach (int levelId in intersectedLevels)
+            {
+                foreach (Layer layer in currentProject.Levels[levelId].LayerInstances)
+                {
+                    if (layer.Identifier == "Foreground_IntGrid")
+                    {
+                        IntGridLayer intGridLayer = layer as IntGridLayer;
+                        foreach (Point point in intGridLayer.GetPointsByValue(1))
+                        {
+                            result.Add(new Rectangle(
+                                point.X * intGridLayer.GridSize + levels[levelId].Rectangle.Location.X,
+                                point.Y * intGridLayer.GridSize + levels[levelId].Rectangle.Location.Y,
+                                intGridLayer.GridSize,
+                                intGridLayer.GridSize));
+                        }
+                    }
+                }
+            }
+            return result;
         }
     }
 }
