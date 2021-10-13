@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-#if DEBUG
 using MonoGame;
-#endif
 using MonoGame_LDtk_Importer;
-using Proto_Engine.Lights;
+using Proto_Engine.Data;
+using Proto_Engine.TheGame;
+using Proto_Engine.Utils;
 
 namespace Proto_Engine.Scene
 {
@@ -29,7 +29,7 @@ namespace Proto_Engine.Scene
             currentProject = DataManager.Projects[projectName];
             foreach (Level level in currentProject.Levels)
             {
-                levels.Add(new LevelTilesRenderer(level, graphicsDevice));
+                levels.Add(new LevelTilesRenderer(level, Color.White, graphicsDevice));
             }
 
             tilesets = new Dictionary<int, Texture2D>();
@@ -49,7 +49,7 @@ namespace Proto_Engine.Scene
                 levels = new List<LevelTilesRenderer>();
                 foreach (Level level in currentProject.Levels)
                 {
-                    levels.Add(new LevelTilesRenderer(level, graphicsDevice));
+                    levels.Add(new LevelTilesRenderer(level, Color.White, graphicsDevice));
                 }
 
                 tilesets = new Dictionary<int, Texture2D>();
@@ -66,7 +66,7 @@ namespace Proto_Engine.Scene
         {
             levels[currentLevelId].Render(spriteBatch, tilesets);
 #if DEBUG
-            if (ProtoEngine.debug)
+            if (GameMode.viewCollisions)
             foreach (Rectangle rect in currentCollisions)
             {
                 spriteBatch.DrawRectangle(new Rectangle(rect.Location - Camera.offset.ToPoint(), rect.Size), Color.Red, 1);
@@ -96,7 +96,7 @@ namespace Proto_Engine.Scene
             int i = 0;
             int possibility = currentLevelId;
             Rectangle newRectangle = new Rectangle();
-            Rectangle playerRectangle = new Rectangle(ProtoEngine.player.Position.ToPoint(), ProtoEngine.player.BaseRectangle.Size);
+            Rectangle playerRectangle = new Rectangle(GameMode.player.Position.ToPoint(), GameMode.player.BaseRectangle.Size);
             int counter = 0;
             foreach (LevelTilesRenderer level in levels)
             {

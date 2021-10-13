@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Proto_Engine.Lights
+namespace Proto_Engine.Utils
 {
     public static class LightCreator
     {

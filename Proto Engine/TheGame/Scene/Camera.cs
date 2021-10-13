@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Proto_Engine.Entities;
+using Proto_Engine.TheGame;
 
 namespace Proto_Engine.Scene
 {
@@ -24,20 +25,23 @@ namespace Proto_Engine.Scene
         /// </summary>
         private static void CalculateOffset()
         {
-            Rectangle levelRect = ProtoEngine.currentProject.currentLevelRectangle;
-            offset = new Vector2(focusedEntity.Position.X - (ProtoEngine.PixelWidth / 2 - focusedEntity.BaseRectangle.Width), focusedEntity.Position.Y - (ProtoEngine.PixelHeight / 2 - focusedEntity.BaseRectangle.Height));
+            Rectangle levelRect = GameMode.currentProject.currentLevelRectangle;
+            offset = new Vector2(
+                focusedEntity.Position.X - (GameMode.PixelWidth / 2 - focusedEntity.BaseRectangle.Width),
+                focusedEntity.Position.Y - (GameMode.PixelHeight / 2 - focusedEntity.BaseRectangle.Height)
+                );
 
-            if (offset.X > levelRect.Location.X + levelRect.Width - ProtoEngine.PixelWidth)
+            if (offset.X > levelRect.Location.X + levelRect.Width - GameMode.PixelWidth)
             {
-                offset.X = levelRect.Location.X + levelRect.Width - ProtoEngine.PixelWidth;
+                offset.X = levelRect.Location.X + levelRect.Width - GameMode.PixelWidth;
             }
             if (offset.X < levelRect.Location.X )
             {
                 offset.X = levelRect.Location.X;
             }
-            if (offset.Y > levelRect.Location.Y + levelRect.Height - ProtoEngine.PixelHeight)
+            if (offset.Y > levelRect.Location.Y + levelRect.Height - GameMode.PixelHeight)
             {
-                offset.Y = levelRect.Location.Y + levelRect.Height - ProtoEngine.PixelHeight;
+                offset.Y = levelRect.Location.Y + levelRect.Height - GameMode.PixelHeight;
             }
             if (offset.Y < levelRect.Location.Y)
             {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 
-namespace Proto_Engine
+namespace Proto_Engine.Utils
 {
     public static class RectangleCollisionsExtensions
     {

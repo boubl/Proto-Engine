@@ -1,18 +1,19 @@
-﻿using Microsoft.Xna.Framework;
+﻿using ImGuiNET;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace ImGuiNET
+namespace Proto_Engine.Utils
 {
     /// <summary>
     /// ImGui renderer for use with XNA-likes (FNA & MonoGame)
     /// </summary>
     public class ImGuiRenderer
     {
-        private Game _game;
+        private Microsoft.Xna.Framework.Game _game;
 
         // Graphics
         private GraphicsDevice _graphicsDevice;
@@ -39,7 +40,7 @@ namespace ImGuiNET
 
         private List<int> _keys = new List<int>();
 
-        public ImGuiRenderer(Game game)
+        public ImGuiRenderer(Microsoft.Xna.Framework.Game game)
         {
             var context = ImGui.CreateContext();
             ImGui.SetCurrentContext(context);
@@ -110,6 +111,21 @@ namespace ImGuiNET
         public virtual void UnbindTexture(IntPtr textureId)
         {
             _loadedTextures.Remove(textureId);
+        }
+
+        public bool IsTextureBinded(IntPtr textureId)
+        {
+            if (textureId == IntPtr.Zero) return false;
+            else return _loadedTextures.ContainsKey(textureId);
+        }
+
+        public Texture GetBindedTexture(IntPtr textureId)
+        {
+            if (_loadedTextures.ContainsKey(textureId))
+            {
+                return _loadedTextures[textureId];
+            }
+            else throw new ArgumentOutOfRangeException($"Could not find a texture with id '{textureId}', please check your bindings");
         }
 
         /// <summary>

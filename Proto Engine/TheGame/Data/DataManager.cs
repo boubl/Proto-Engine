@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Graphics;
+﻿using BmFont;
+using Microsoft.Xna.Framework.Graphics;
 using MonoGame_LDtk_Importer;
 using Proto_Engine.Tools;
 using System;
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Proto_Engine
+namespace Proto_Engine.Data
 {
     public static class DataManager
     {
@@ -60,7 +61,7 @@ namespace Proto_Engine
         public static void LoadTextures(GraphicsDevice graphicsDevice)
         {
             Textures = new Dictionary<string, Texture2D>();
-            Textures.Add("noel character", Texture2D.FromFile(graphicsDevice, ContentFolder + "sprites/spriteSheets/noel character.png"));
+            Textures.Add("sourya", Texture2D.FromFile(graphicsDevice, ContentFolder + "sprites/spriteSheets/sourya.png"));
         }
 
         //Aseprite Animations
@@ -68,7 +69,7 @@ namespace Proto_Engine
         public static void LoadAnimations()
         {
             Animations = new Dictionary<string, AsepriteFile>();
-            Animations.Add("noel character", new AsepriteFile(ContentFolder + "sprites/spriteSheets/noel character.json"));
+            Animations.Add("sourya", new AsepriteFile(ContentFolder + "sprites/spriteSheets/sourya.json"));
         }
 
         //Effects
@@ -80,6 +81,14 @@ namespace Proto_Engine
             {
                 Effects.Add(Path.GetFileNameWithoutExtension(path), new Effect(graphicsDevice, File.ReadAllBytes(path)));
             }
+        }
+
+        public static Dictionary<string, BitmapFont> Fonts { get; private set; }
+
+        public static void LoadFonts(GraphicsDevice graphicsDevice)
+        {
+            Fonts = new Dictionary<string, BitmapFont>();
+            Fonts.Add("Tamsyn", FontLoader.Load("Content/fonts/Tamsyn.fnt", graphicsDevice));
         }
     }
 }

@@ -4,7 +4,7 @@ using MonoGame_LDtk_Importer;
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Proto_Engine.Lights;
+using Proto_Engine.Utils;
 
 namespace Proto_Engine.Scene
 {
@@ -18,7 +18,7 @@ namespace Proto_Engine.Scene
         Vector2 bgScale;
         Vector2 bgCoordinates;
 
-        public LevelTilesRenderer(Level level, GraphicsDevice graphicsDevice)
+        public LevelTilesRenderer(Level level, Color backgroundColor, GraphicsDevice graphicsDevice)
         {
             List<LayerType> types = new List<LayerType>();
             types.Add(LayerType.AutoLayer);

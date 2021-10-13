@@ -5,8 +5,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using MonoGame;
+using Proto_Engine.Data;
 using Proto_Engine.Scene;
+using Proto_Engine.TheGame;
 using Proto_Engine.Tools;
+using Proto_Engine.Utils;
 
 namespace Proto_Engine.Entities
 {
@@ -33,19 +36,19 @@ namespace Proto_Engine.Entities
         #endregion
 
         const float maxSpeed = 2;
-        const float speedIncrease = 0.5f;
+        const float speedIncrease = 1f;
         const float speedDecrease = 0.25f;
-        const float slippery = 25;
 
-        const float gravity = 2f;
-        const float jumpSpeedIncrease = 2.5f;
-        const float jumpSpeedDecrease = 1f;
-        const float maxJumpSpeed = 7f;
+        const float gravity = 4f;
+        const float jumpSpeedIncrease = 1.5f;
+        const float jumpSpeedDecrease = 0.75f;
+        const float maxJumpSpeed = 6f;
 
         Dictionary<string, Animation> _animations;
         Point textureSize;
         string currentAnimation;
         bool touchGround;
+        bool crouch;
         bool goLeft = false;
         bool hasJumped = false;
         bool jumpButtonWasPressed;
@@ -62,13 +65,13 @@ namespace Proto_Engine.Entities
             #region Get Input
             if (ks.IsKeyDown(Keys.Right) && ks.IsKeyUp(Keys.Left))
             {
-                velocity.X += speedIncrease * (float)gameTime.ElapsedGameTime.TotalMilliseconds / slippery;
+                velocity.X += speedIncrease;
                 if (velocity.X > maxSpeed) velocity.X = maxSpeed;
                 goLeft = false;
             }
             else if (ks.IsKeyDown(Keys.Left) && ks.IsKeyUp(Keys.Right))
             {
-                velocity.X -= speedIncrease * (float)gameTime.ElapsedGameTime.TotalMilliseconds / slippery;
+                velocity.X -= speedIncrease;
                 if (velocity.X < -maxSpeed) velocity.X = -maxSpeed;
                 goLeft = true;
             }
@@ -77,12 +80,12 @@ namespace Proto_Engine.Entities
                 if (goLeft)
                 {
                     if (velocity.X + speedDecrease > 0) velocity.X = 0;
-                    else velocity.X += speedDecrease * (float)gameTime.ElapsedGameTime.TotalMilliseconds / slippery;
+                    else velocity.X += speedDecrease;
                 }
                 else
                 {
                     if (velocity.X - speedDecrease < 0) velocity.X = 0;
-                    else velocity.X -= speedDecrease * (float)gameTime.ElapsedGameTime.TotalMilliseconds / slippery;
+                    else velocity.X -= speedDecrease;
                 }
             }
 
@@ -98,7 +101,7 @@ namespace Proto_Engine.Entities
             {
                 if (!hasJumped)
                 {
-                    velocity.Y -= jumpSpeedIncrease * (float)gameTime.ElapsedGameTime.TotalMilliseconds / slippery;
+                    velocity.Y -= jumpSpeedIncrease;
                     if (velocity.Y < -maxJumpSpeed)
                     {
                         hasJumped = true;
@@ -109,16 +112,17 @@ namespace Proto_Engine.Entities
             #endregion
 
             #region Apply Gravity
-            if (new Rectangle(collision.X, collision.Y + 1, collision.Width, collision.Height).CollideAt(ProtoEngine.currentProject.currentCollisions))
+            if (new Rectangle(collision.X, collision.Y + 1, collision.Width, collision.Height).CollideAt(GameMode.currentProject.currentCollisions))
             {
                 touchGround = true;
-                if (hasJumped) hasJumped = false;
+                hasJumped = false;
                 if (velocity.Y > 0) velocity.Y = 0;
             }
             else
             {
                 touchGround = false;
-                velocity.Y += jumpSpeedDecrease * (float)gameTime.ElapsedGameTime.TotalMilliseconds / slippery;
+                if (ks.IsKeyUp(Keys.Space)) hasJumped = true; 
+                velocity.Y += jumpSpeedDecrease;
                 if (velocity.Y > gravity)
                 {
                     velocity.Y = gravity;
@@ -140,7 +144,7 @@ namespace Proto_Engine.Entities
                 int signY = Math.Sign(moveY);
                 while (moveX != 0)
                 {
-                    if (!new Rectangle(collision.Location + new Point(signX, 0), collision.Size).CollideAt(ProtoEngine.currentProject.currentCollisions))
+                    if (!new Rectangle(collision.Location + new Point(signX, 0), collision.Size).CollideAt(GameMode.currentProject.currentCollisions))
                     {
                         //There is no Solid immediately beside us 
                         Position.X += signX;
@@ -155,7 +159,7 @@ namespace Proto_Engine.Entities
 
                 while (moveY != 0)
                 {
-                    if (!new Rectangle(collision.Location + new Point(0, signY), collision.Size).CollideAt(ProtoEngine.currentProject.currentCollisions))
+                    if (!new Rectangle(collision.Location + new Point(0, signY), collision.Size).CollideAt(GameMode.currentProject.currentCollisions))
                     {
                         //There is no Solid immediately beside us 
                         Position.Y += signY;
@@ -178,12 +182,20 @@ namespace Proto_Engine.Entities
             if (goLeft)
             {
                 newCollision = _animations[currentAnimation].GetCurrentCollision();
+                if (crouch) newCollision = new Rectangle(
+                                                newCollision.Location - new Point(-1, -7),
+                                                new Point(
+                                                    newCollision.Width + 2, newCollision.Height - 7));
                 newCollision.X = textureSize.X - newCollision.X - newCollision.Width;
                 newCollision.Location += Position.ToPoint();
             }
             else
             {
                 newCollision = _animations[currentAnimation].GetCurrentCollision();
+                if (crouch) newCollision = new Rectangle(
+                                                newCollision.Location - new Point(1, -7),
+                                                new Point(
+                                                    newCollision.Width + 2, newCollision.Height - 7));
                 newCollision.Location += Position.ToPoint();
             }
             return newCollision;
@@ -193,8 +205,11 @@ namespace Proto_Engine.Entities
         {
             if (ks.IsKeyDown(Keys.Right) && ks.IsKeyUp(Keys.Left)) currentAnimation = "Walk";
             else if (ks.IsKeyDown(Keys.Left) && ks.IsKeyUp(Keys.Right)) currentAnimation = "Walk";
-            else if (ks.IsKeyDown(Keys.Down)) currentAnimation = "Crouch";
             else currentAnimation = "Idle";
+
+            if (ks.IsKeyDown(Keys.Down) && touchGround) crouch = true;
+            else crouch = false;
+
             if (!touchGround && velocity.Y <= 1 && velocity.Y >= -1) currentAnimation = "AfterJump";
             else if (!touchGround && velocity.Y < -1) currentAnimation = "Jump";
             else if (!touchGround && velocity.Y > 1) currentAnimation = "Falling";
@@ -207,26 +222,38 @@ namespace Proto_Engine.Entities
         #region Drawing
         public override void Draw(SpriteBatch spriteBatch)
         {
-            _animations[currentAnimation].Draw(spriteBatch, Position - Camera.offset, goLeft);
+            if (crouch)
+                _animations[currentAnimation].Draw(
+                    spriteBatch,
+                    new Rectangle(
+                        Position.ToPoint() - Camera.offset.ToPoint() - new Point(1, -7),
+                        new Point(
+                            _animations[currentAnimation].CurrentFrame.Width + 2, _animations[currentAnimation].CurrentFrame.Height - 7)),
+                    goLeft
+                );
+            else
+                _animations[currentAnimation].Draw(spriteBatch, Position - Camera.offset, goLeft);
 #if DEBUG
-            if (ProtoEngine.debug) spriteBatch.DrawRectangle(new Rectangle(collision.Location - Camera.offset.ToPoint(), collision.Size), Color.Red);
+            if (GameMode.viewCollisions) spriteBatch.DrawRectangle(new Rectangle(collision.Location - Camera.offset.ToPoint(), collision.Size), Color.Red);
 #endif
         }
         public void DrawLight(SpriteBatch spriteBatch)
         {
             Vector2 pos = Position - Camera.offset - (new Vector2(BaseRectangle.Width * 5 / 2, BaseRectangle.Width * 5 / 2));
-            spriteBatch.Draw(Lights.LightCreator.Light, new Rectangle(pos.ToPoint(), new Point(BaseRectangle.Width * 5, BaseRectangle.Width * 5 )), Color.White);
+            spriteBatch.Draw(LightCreator.Light, new Rectangle(pos.ToPoint(), new Point(BaseRectangle.Width * 5, BaseRectangle.Width * 5 )), Color.White);
         }
 
         public void DrawImGui(ref bool drawIt)
         {
-            ImGui.Begin("Player", ref drawIt);
-            ImGui.Text("Position: " + Position.ToString());
-            ImGui.Text("Velocity:" + velocity.ToString());
-            ImGui.Text("Has Jumped: " + hasJumped.ToString());
-            ImGui.Text("Touch Ground: " + touchGround);
-            ImGui.Text("Jump Button Was Pressed: " + jumpButtonWasPressed.ToString());
-            ImGui.End();
+            if (drawIt && ImGui.Begin("Player", ref drawIt))
+            {
+                ImGui.Text("Position: " + Position.ToString());
+                ImGui.Text("Velocity:" + velocity.ToString());
+                ImGui.Text("Has Jumped: " + hasJumped.ToString());
+                ImGui.Text("Touch Ground: " + touchGround);
+                ImGui.Text("Jump Button Was Pressed: " + jumpButtonWasPressed.ToString());
+                ImGui.End();
+            }
         }
         #endregion
     }

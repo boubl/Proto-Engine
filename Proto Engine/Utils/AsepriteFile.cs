@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Proto_Engine.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -209,6 +210,26 @@ namespace Proto_Engine.Tools
             else
             {
                 destinationRectangle.Location += position.ToPoint();
+                spriteBatch.Draw(DataManager.Textures[_textureName], destinationRectangle, CurrentFrame.SourceRectangle, Color.White);
+            }
+        }
+
+        public void Draw(SpriteBatch spriteBatch, Rectangle position, bool isTextureReversedOnX)
+        {
+            Rectangle destinationRectangle = CurrentFrame.DestinationRectangle;
+            if (isTextureReversedOnX)
+            {
+                destinationRectangle.Width = position.Width;
+                destinationRectangle.Height = position.Height;
+                destinationRectangle.X = CurrentFrame.SourceSize.X - destinationRectangle.X - destinationRectangle.Width + 1;
+                destinationRectangle.Location += position.Location;
+                spriteBatch.Draw(DataManager.Textures[_textureName], destinationRectangle, CurrentFrame.SourceRectangle, Color.White, 0f, Vector2.Zero, SpriteEffects.FlipHorizontally, 1f);
+            }
+            else
+            {
+                destinationRectangle.Location += position.Location;
+                destinationRectangle.Width = position.Width;
+                destinationRectangle.Height = position.Height;
                 spriteBatch.Draw(DataManager.Textures[_textureName], destinationRectangle, CurrentFrame.SourceRectangle, Color.White);
             }
         }
